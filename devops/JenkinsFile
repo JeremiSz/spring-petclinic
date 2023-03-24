@@ -1,8 +1,6 @@
 pipeline{
     agent{
-        docker{
-            image 'maven:3-openjdk-18'
-        }
+        docker{ image 'maven:3-openjdk-18'}
     }
     tools{
         codeql 'codeql'
@@ -16,8 +14,8 @@ pipeline{
         stage('test'){
             steps{
                 sh 'mvn test'
-                codeql 'autobuild'
-                codeql 'analyze'
+                sh 'codeql database create --language=java --source-root=. --output=codeql-db'
+                sh 'codeql database analyze codeql-db codeql/java-all-queries.qls --format=csv --output=codeql-results.csv'
             }
         }
     }
